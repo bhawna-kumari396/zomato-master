@@ -21,5 +21,8 @@ const RestaurantSchema = new mongoose.Schema({
     ref: "Menus",
   },
 
-  reviews: [{type: mongoose.Types.ObjectId, ref: "Reviews"}],
+  reviews: [{ type: mongoose.Types.ObjectId, ref: "Reviews" }],
+  photos: { type: mongoose.Types.ObjectId, ref: "Images" },
 });
+
+const RestaurantModel = mongoose.model("Restaurants", RestaurantSchema);
