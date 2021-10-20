@@ -1,6 +1,6 @@
 import express from "express";
-import bcrypt from "bcryptjs";
-import { UserModel } from "../../database/user";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const Router = express.Router();
 
@@ -12,21 +12,24 @@ import { UserModel } from "../../database/user";
 Route:       /signup
 Descrip:     SignUp with email and password
 Params:       None
-Access:       Post
+Access:       Public
+Method:        POST
 */
 
 Router.post("/signup", async (req, res) => {
   try {
-    const { email, password, fullname, phoneNumber } = req.body.credential;
-    //Check whether email or phone number exists
-    const checkUserByEmail = await UserModel.findOne({ email });
-    const checkUserByPhone = await UserModel.findOne({ phoneNumber });
+    
 
-    if (checkUserByEmail || checkUserByPhone) {
-      return res.json({ error: "User already Exists" });
-    }
-//hashing
-    const bcryptSalt = await bcrypt.genSalt(8);
+    await UserModel.findEmailAndPhone(req.body.credentials);
+
+    //DB
+    const newUser = await UserModel.create(req.body.credentials);
+
+    //JWT Auth Token
+
+    const token = newUser.generateJwtToken();
+
+    return res.status(200).json({token});
   } catch (error) {
     return res.status(500).json({
       error: error.message,
